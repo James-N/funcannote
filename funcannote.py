@@ -127,7 +127,7 @@ class AnnotableFunction(AbstractAnnotableFunction):
 
 class AnnotableFunctionDelegate(AbstractAnnotableFunction):
     """
-    delegate class used when attach annotation framework to methods
+    delegate class created when AnnotableFunction is invoked as a method
     """
 
     __slots__ = ('_afunc', '_caller')
