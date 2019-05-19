@@ -6,6 +6,7 @@ Function Annotation
 * [Introduction](#introduction)
 * [Basic workflow](#basic-workflow)
 * [Decorator compatiblility](#decorator-compatiblility)
+* [Environment required](#environment-required)
 
 
 Introduction
@@ -124,3 +125,8 @@ def example_1():
 def example_2():
     return 'hello world'
 ```
+
+Environment required
+--------------------
+
+Python3+
