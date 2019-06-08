@@ -25,7 +25,7 @@ class DecoratorTest(unittest.TestCase):
         @decorator
         def foo(val):
             return val * 5
-        
+
         @decorator
         @AnnotationTypeA()
         def bar(val):
@@ -55,7 +55,7 @@ class DecoratorTest(unittest.TestCase):
         @decorator_fac(5)
         def foo(val):
             return val * 5
-        
+
         @decorator_fac(4)
         @AnnotationTypeB()
         def bar(val):

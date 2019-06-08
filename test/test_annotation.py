@@ -17,7 +17,7 @@ class AnnotationTest(unittest.TestCase):
         func.add_annotation(AnnotationTypeA())
         func.add_annotation(AnnotationTypeA())
         func.add_annotation(AnnotationTypeB())
-    
+
         self.assertIsInstance(func.get_annotation(AnnotationTypeA), AnnotationTypeA)
         self.assertIsInstance(func.get_annotation(AnnotationTypeB), AnnotationTypeB)
 
@@ -65,3 +65,25 @@ class AnnotationTest(unittest.TestCase):
         instance = Test('test')
         self.assertIsInstance(instance.get_data, AbstractAnnotableFunction)
         self.assertEqual(instance.get_data(), 'test')
+
+    def test_annotation_classmethod(self):
+        class Test(object):
+            data = 'test'
+
+            @AnnotationTypeA()
+            @classmethod
+            def get_data(cls):
+                return cls.data
+
+        self.assertIsInstance(Test.get_data, AbstractAnnotableFunction)
+        self.assertEqual(Test.get_data(), 'test')
+
+    def test_annotation_staticmethod(self):
+        class Test(object):
+            @AnnotationTypeA()
+            @staticmethod
+            def get_data():
+                return 'test'
+
+        self.assertIsInstance(Test.get_data, AbstractAnnotableFunction)
+        self.assertEqual(Test.get_data(), 'test')

@@ -6,11 +6,19 @@ __all__ = ['FunctionAnnotation', 'AbstractAnnotableFunction', 'AnnotableFunction
            'annotation_compatible', 'annotation_compatible_ex']
 
 
+def is_annotable_type(obj):
+    """
+    check whether given object can be decorated
+    """
+
+    return callable(obj) or isinstance(obj, classmethod) or isinstance(obj, staticmethod)
+
+
 class FunctionAnnotation(object, metaclass=ABCMeta):
     """
     base class for function annotation
     """
-    
+
     def __call__(self, func):
         if not isinstance(func, AnnotableFunction):
             func = convert_to_annotable(func)
@@ -54,8 +62,8 @@ class AnnotableFunction(AbstractAnnotableFunction):
 
 
     def __init__(self, func):
-        if not callable(func):
-            raise TypeError("func must be callable")
+        if not is_annotable_type(func):
+            raise TypeError("func must be callable or classmethod/staticmethod")
 
         self._func = func
         self._annotations = []
@@ -69,7 +77,7 @@ class AnnotableFunction(AbstractAnnotableFunction):
         use getter function intercepts method call
         """
 
-        delegate = AnnotableFunctionDelegate(self, instance)
+        delegate = AnnotableFunctionDelegate(self, instance, owner)
         functools.update_wrapper(delegate, wrapped=self,
                                  assigned=functools.WRAPPER_ASSIGNMENTS, updated=())
 
@@ -124,21 +132,29 @@ class AnnotableFunction(AbstractAnnotableFunction):
         func = self._func
         self._func = decorator(func)
 
+    def get_wrapped(self):
+        return self._func
+
 
 class AnnotableFunctionDelegate(AbstractAnnotableFunction):
     """
     delegate class created when AnnotableFunction is invoked as a method
     """
 
-    __slots__ = ('_afunc', '_caller')
+    __slots__ = ('_afunc', '_caller', '_caller_owner')
 
-    def __init__(self, afunc, caller):
+    def __init__(self, afunc, caller, caller_owner):
         self._caller = caller
+        self._caller_owner = caller_owner
         self._afunc = afunc
 
     def __call__(self, *args, **kwargs):
-        func = self._afunc
-        return func.__call__(self._caller, *args, **kwargs)
+        func = self._afunc.get_wrapped()
+        if isinstance(func, (classmethod, staticmethod)):
+            func = func.__get__(self._caller, self._caller_owner)
+            return func(*args, **kwargs)
+        else:
+            return func(self._caller, *args, **kwargs)
 
     def add_annotation(self, annotation):
         self._afunc.add_annotation(annotation)
