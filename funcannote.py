@@ -11,7 +11,7 @@ def is_annotable_type(obj):
     check whether given object can be decorated
     """
 
-    return callable(obj) or isinstance(obj, classmethod) or isinstance(obj, staticmethod)
+    return callable(obj) or isinstance(obj, (classmethod, staticmethod))
 
 
 class FunctionAnnotation(object, metaclass=ABCMeta):
